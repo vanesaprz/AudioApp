@@ -170,7 +170,7 @@ fun AudioScreen(navController: NavHostController) {
 
         Button(onClick = {
             player.play { status = it }
-            if (status == "Preparado") status = "Reproduciendo..."
+            if (status == "Audio preparado y listo") status = "Reproduciendo..."
         }) { Text("Play") }
 
         Button(onClick = {
