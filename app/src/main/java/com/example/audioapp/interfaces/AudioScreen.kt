@@ -2,14 +2,29 @@ package com.example.audioapp.interfaces
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -19,7 +34,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.audioapp.media.SimpleAudioPlayer
@@ -43,7 +60,7 @@ fun AudioScreen(navController: NavHostController) {
 
     DisposableEffect(Unit) {
         onDispose {
-            recorder.stop()
+            if (isRecording) recorder.stop()
             player.release()
         }
     }
@@ -53,20 +70,63 @@ fun AudioScreen(navController: NavHostController) {
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.statusBars)
             .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier.align(Alignment.Start)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("< Volver")
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+            }
+            Text(
+                text = "Nueva Nota de Voz",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
         }
-        
-        Text("Audio - Grabar y reproducir")
-        Text("Permiso microfono: ${if (isPermissionGranted) "OK" else "NO"}")
 
-        Text("Estado: ${status}")
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // --- PANEL DE ESTADO DE PERMISOS ---
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            SuggestionChip(
+                onClick = { if (!isPermissionGranted) requestPermission() },
+                label = { Text(if (isPermissionGranted) "Micrófono OK" else "Sin Permiso de Micrófono") },
+                icon = {
+                    Icon(
+                        imageVector = if (isPermissionGranted) Icons.Default.CheckCircle else Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = if (isPermissionGranted) Color(0xFF4CAF50) else Color.Red,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            )
+        }
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            )
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Default.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(text = status, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
 
         Button(
             onClick = {
