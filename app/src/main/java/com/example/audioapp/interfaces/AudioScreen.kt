@@ -225,7 +225,7 @@ fun AudioScreen(navController: NavHostController) {
         Button(
             onClick = {
                 player.play { status = it }
-                if (status == "Audio preparado y listo") status = "Reproduciendo..."
+                if (player.isPlaying) status = "Reproduciendo..."
             }, enabled = !isRecording
         ) { Text("Play") }
 
