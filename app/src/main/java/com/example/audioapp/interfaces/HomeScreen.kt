@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +56,12 @@ fun HomeScreen(navController: NavHostController) {
         audioFiles = AppFiles.listAudios(context)
     }
 
-
+    DisposableEffect(Unit) {
+        onDispose {
+            player.stop()
+            player.release()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -147,7 +153,6 @@ fun AudioItem(audio: AudioNote, isSelected: Boolean, onClick: () -> Unit) {
             )
             Spacer(Modifier.width(12.dp))
             Column {
-                // Ahora usamos las propiedades del objeto AudioNote
                 Text(text = audio.name, style = MaterialTheme.typography.titleMedium)
                 Text(
                     text = SimpleDateFormat(
