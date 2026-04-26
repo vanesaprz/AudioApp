@@ -171,36 +171,45 @@ fun AudioScreen(navController: NavHostController) {
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-        Button(onClick = {
-            currentFile?.let { file -> // Solo entra aquí si no es nulo
-                status = "Preparando ${file.name}"
-                player.prepareFromFile(
-                    file = file,
-                    onPrepared = { status = "Audio preparado y listo" },
-                    onCompleted = { status = "Reproducción finalizada" },
-                    onError = { msg -> status = msg }
-                )
-            } ?: run {
-                status = "Error: Primero debes grabar un audio"
-            }
-        }) {
+        Button(
+            onClick = {
+                currentFile?.let { file -> // Solo entra aquí si no es nulo
+                    status = "Preparando ${file.name}"
+                    player.prepareFromFile(
+                        file = file,
+                        onPrepared = { status = "Audio preparado y listo" },
+                        onCompleted = { status = "Reproducción finalizada" },
+                        onError = { msg -> status = msg }
+                    )
+                } ?: run {
+                    status = "Error: Primero debes grabar un audio"
+                }
+            }, enabled = !isRecording
+        ) {
             Text("Preparar audio grabado")
         }
 
-        Button(onClick = {
-            player.play { status = it }
-            if (status == "Audio preparado y listo") status = "Reproduciendo..."
-        }) { Text("Play") }
+        Button(
+            onClick = {
+                player.play { status = it }
+                if (status == "Audio preparado y listo") status = "Reproduciendo..."
+            }, enabled = !isRecording
+        ) { Text("Play") }
 
-        Button(onClick = {
-            player.pause()
-            status = "Pausado"
-        }) { Text("Pause") }
+        Button(
+            onClick = {
+                player.pause()
+                status = "Pausado"
+            }, enabled = !isRecording
+        ) { Text("Pause") }
 
-        Button(onClick = {
-            player.stop()
-            status = "Parado"
-        }) { Text("Stop") }
+        Button(
+            onClick = {
+                player.stop()
+                status = "Parado"
+            },
+            enabled = !isRecording
+        ) { Text("Stop") }
 
 
     }
