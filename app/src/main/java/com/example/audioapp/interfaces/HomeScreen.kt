@@ -45,7 +45,6 @@ import java.util.Locale
 @Composable
 fun HomeScreen(navController: NavHostController) {
     val context = LocalContext.current
-    // Cambiamos File por AudioNote
     var audioFiles by remember { mutableStateOf(listOf<AudioNote>()) }
     var selectedAudio by remember { mutableStateOf<AudioNote?>(null) }
     var status by remember { mutableStateOf("Selecciona un audio") }
@@ -62,7 +61,6 @@ fun HomeScreen(navController: NavHostController) {
             player.release()
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -118,12 +116,26 @@ fun HomeScreen(navController: NavHostController) {
                     isSelected = selectedAudio?.id == audio.id,
                     onClick = {
                         if (selectedAudio == audio) {
-                            if (!player.isPlaying) {
-                                player.play { status = it }
-                                status = "Reproduciendo: ${audio.name}"
-                            } else {
+                            if (player.isPlaying) {
                                 player.pause()
                                 status = "Pausado"
+                            } else {
+                                player.play { error ->
+                                    status = "Volviendo a cargar el audio..."
+                                    player.prepareFromFile(
+                                        file = audio.file,
+                                        onPrepared = {
+                                            player.play { status = it }
+                                            status = "Reproduciendo: ${audio.name}"
+                                        },
+                                        onCompleted = { status = "Reproducción finalizada" },
+                                        onError = { status = it }
+                                    )
+                                }
+                                if (player.isPlaying) {
+                                    status = "Reproduciendo: ${audio.name}"
+                                }
+
                             }
                         } else {
                             selectedAudio = audio
