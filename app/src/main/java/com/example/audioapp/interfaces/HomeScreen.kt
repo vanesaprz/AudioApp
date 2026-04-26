@@ -122,6 +122,7 @@ fun HomeScreen(navController: NavHostController) {
                             } else {
                                 player.play { error ->
                                     status = "Volviendo a cargar el audio..."
+                                    player.stop()
                                     player.prepareFromFile(
                                         file = audio.file,
                                         onPrepared = {

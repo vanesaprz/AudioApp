@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -127,6 +128,22 @@ fun AudioScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.weight(1f))
 
+        if (isRecording) {
+            Text(
+                text = "GRABANDO...",
+                color = Color.Red,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.labelLarge
+            )
+
+            androidx.compose.material3.LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                color = Color.Red
+            )
+        }
+
         Button(
             onClick = {
                 if (isPermissionGranted) {
@@ -145,7 +162,10 @@ fun AudioScreen(navController: NavHostController) {
                 } else {
                     requestPermission()
                 }
-            }
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isRecording) Color.Red else MaterialTheme.colorScheme.primary
+            )
         ) {
             Text(if (isRecording) "Detener Grabación" else "Iniciar Grabación")
         }
