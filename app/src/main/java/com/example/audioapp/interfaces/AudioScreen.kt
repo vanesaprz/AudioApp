@@ -58,6 +58,17 @@ fun AudioScreen(navController: NavHostController) {
     val recorder = remember { SimpleAudioRecorder() }
 
     var isRecording by remember { mutableStateOf(false) }
+    var showPermissionWarning by remember { mutableStateOf(false) }
+
+
+    androidx.compose.runtime.LaunchedEffect(isPermissionGranted) {
+        if (isPermissionGranted) {
+            showPermissionWarning = false
+            if (status.contains("Error: Permiso")) {
+                status = "Permiso concedido. Listo para grabar."
+            }
+        }
+    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -122,8 +133,22 @@ fun AudioScreen(navController: NavHostController) {
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.width(12.dp))
-                Text(text = status, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = if (isPermissionGranted) status else "Permiso micrófono necesario",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
+        }
+
+        if (showPermissionWarning && !isPermissionGranted) {
+            Text(
+                text = "No podemos grabar audio porque el permiso está desactivado. " +
+                        "Si no aparece el mensaje del sistema, por favor activa el Micrófono en " +
+                        "los Ajustes de tu teléfono.",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -147,7 +172,13 @@ fun AudioScreen(navController: NavHostController) {
         Button(
             onClick = {
                 if (isPermissionGranted) {
+                    showPermissionWarning = false
+                    if (status == "Error: Permiso de micrófono denegado") {
+                        status = "Permiso concedido. Listo para grabar."
+                    }
                     if (!isRecording) {
+                        player.release()
+
                         val newFile = AppFiles.newAudioFile(context)
                         currentFile = newFile
 
@@ -161,6 +192,8 @@ fun AudioScreen(navController: NavHostController) {
                     }
                 } else {
                     requestPermission()
+                    showPermissionWarning = true
+                    status = "Error: Permiso de micrófono denegado"
                 }
             },
             colors = ButtonDefaults.buttonColors(
@@ -184,9 +217,9 @@ fun AudioScreen(navController: NavHostController) {
                 } ?: run {
                     status = "Error: Primero debes grabar un audio"
                 }
-            }, enabled = !isRecording
+            }, enabled = !isRecording && currentFile != null
         ) {
-            Text("Preparar audio grabado")
+            Text("Preparar")
         }
 
         Button(
