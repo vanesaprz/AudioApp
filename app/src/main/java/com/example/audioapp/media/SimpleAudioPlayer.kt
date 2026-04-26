@@ -61,4 +61,7 @@ class SimpleAudioPlayer {
         mp?.release()
         mp = null
     }
+
+    val isPlaying: Boolean
+        get() = mp?.isPlaying ?: false
 }

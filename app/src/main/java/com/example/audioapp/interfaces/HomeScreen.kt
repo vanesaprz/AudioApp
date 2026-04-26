@@ -117,14 +117,24 @@ fun HomeScreen(navController: NavHostController) {
                     audio = audio,
                     isSelected = selectedAudio?.id == audio.id,
                     onClick = {
-                        selectedAudio = audio
-                        status = "Preparando..."
-                        player.prepareFromFile(
-                            file = audio.file,
-                            onPrepared = { status = "Listo para reproducir" },
-                            onCompleted = { status = "Listo" },
-                            onError = { status = it }
-                        )
+                        if (selectedAudio == audio) {
+                            if (!player.isPlaying) {
+                                player.play { status = it }
+                                status = "Reproduciendo: ${audio.name}"
+                            } else {
+                                player.pause()
+                                status = "Pausado"
+                            }
+                        } else {
+                            selectedAudio = audio
+                            status = "Preparando..."
+                            player.prepareFromFile(
+                                file = audio.file,
+                                onPrepared = { status = "Listo para reproducir" },
+                                onCompleted = { status = "Fin de reproducción" },
+                                onError = { status = it }
+                            )
+                        }
                     }
                 )
             }
