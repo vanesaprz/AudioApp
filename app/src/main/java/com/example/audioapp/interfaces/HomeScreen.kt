@@ -77,7 +77,7 @@ fun HomeScreen(navController: NavHostController) {
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
             ) {
                 Column(
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text("Nota: ${audio.name}", style = MaterialTheme.typography.bodyMedium)
@@ -107,6 +107,23 @@ fun HomeScreen(navController: NavHostController) {
                 .padding(vertical = 8.dp)
         ) {
             Text("Grabar Nueva Nota")
+        }
+
+        if (audioFiles.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                Text(
+                    text = "Pulsa el botón de arriba para grabar tu primera nota.",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)
+                )
+            }
         }
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
